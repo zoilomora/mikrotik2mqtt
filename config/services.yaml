@@ -1,0 +1,60 @@
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
+parameters:
+  app.update_time: '%env(int:UPDATE_TIME)%'
+
+  mikrotik.host: '%env(string:MIKROTIK_HOST)%'
+  mikrotik.use_ssl: '%env(bool:MIKROTIK_USE_SSL)%'
+  mikrotik.user: '%env(string:MIKROTIK_USER)%'
+  mikrotik.password: '%env(string:MIKROTIK_PASSWORD)%'
+
+  mqtt.host: '%env(string:MQTT_HOST)%'
+  mqtt.port: '%env(int:MQTT_PORT)%'
+  mqtt.use_tls: '%env(bool:MQTT_USE_TLS)%'
+  mqtt.username: '%env(string:MQTT_USERNAME)%'
+  mqtt.password: '%env(string:MQTT_PASSWORD)%'
+  mqtt.client_id: '%env(string:MQTT_CLIENT_ID)%'
+  mqtt.topic_base: '%env(string:MQTT_TOPIC_BASE)%'
+
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    bind:
+      App\Domain\Model\Mikrotik\MikrotikRepository $readRepository: '@App\Infrastructure\Domain\Model\Mikrotik\RouterOsMikrotikRepository'
+      App\Domain\Model\Mikrotik\MikrotikRepository $writeRepository: '@App\Infrastructure\Domain\Model\Mikrotik\MqttMikrotikRepository'
+      string $mqttTopicBase: '%mqtt.topic_base%'
+      int $updateTime: '%app.update_time%'
+
+  App\Application\:
+    resource: '../src/Application/'
+
+  App\Entrypoint\Console\Command\:
+    resource: '../src/Entrypoint/Console/Command/'
+
+  App\Infrastructure\Service\RouterOsClientFactory:
+    class: 'App\Infrastructure\Service\RouterOsClientFactory'
+    arguments:
+      $host: '%mikrotik.host%'
+      $useSsl: '%mikrotik.use_ssl%'
+      $user: '%mikrotik.user%'
+      $password: '%mikrotik.password%'
+
+  App\Infrastructure\Service\MqttClientFactory:
+    class: 'App\Infrastructure\Service\MqttClientFactory'
+    arguments:
+      $host: '%mqtt.host%'
+      $port: '%mqtt.port%'
+      $clientId: '%mqtt.client_id%'
+      $username: '%mqtt.username%'
+      $password: '%mqtt.password%'
+      $useTls: '%mqtt.use_tls%'
+
+  App\Infrastructure\Service\RouterOsClient:
+    class: 'App\Infrastructure\Service\RouterOsClient'
+
+  App\Infrastructure\Domain\Model\Mikrotik\RouterOsMikrotikRepository:
+    class: 'App\Infrastructure\Domain\Model\Mikrotik\RouterOsMikrotikRepository'
+
+  App\Infrastructure\Domain\Model\Mikrotik\MqttMikrotikRepository:
+    class: 'App\Infrastructure\Domain\Model\Mikrotik\MqttMikrotikRepository'

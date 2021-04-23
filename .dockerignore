@@ -1,0 +1,12 @@
+/.git
+/.idea
+/tests
+/var
+/vendor
+/.editorconfig
+/.env.local.php
+/.gitignore
+/docker-compose.yml
+/Dockerfile
+/Makefile
+/README.md
