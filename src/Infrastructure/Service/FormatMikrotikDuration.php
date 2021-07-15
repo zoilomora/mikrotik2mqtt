@@ -8,7 +8,7 @@ final class FormatMikrotikDuration
     public static function fromStringToInt(string $duration): int
     {
         $text = \str_replace(
-            ['s', 'm', 'h', 'd'],
+            ['s', 'm', 'h', 'd', 'w'],
             '|',
             $duration
         );
@@ -26,10 +26,11 @@ final class FormatMikrotikDuration
         }
 
         $multiples = [
-            0 => 1,            // Seconds
-            1 => 60,           // Minutes
-            2 => 60 * 60,      // Hours
-            3 => 24 * 60 * 60  // Days
+            0 => 1,                // Seconds
+            1 => 60,               // Minutes
+            2 => 60 * 60,          // Hours
+            3 => 24 * 60 * 60,     // Days
+            4 => 7 * 24 * 60 * 60, // Weeks
         ];
 
         $seconds = 0;
